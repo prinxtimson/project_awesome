@@ -2130,10 +2130,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var primereact_dropdown__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! primereact/dropdown */ "./node_modules/primereact/dropdown/dropdown.esm.js");
 /* harmony import */ var primereact_chart__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! primereact/chart */ "./node_modules/primereact/chart/chart.esm.js");
-/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
-/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _inertiajs_inertia_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @inertiajs/inertia-react */ "./node_modules/@inertiajs/inertia-react/dist/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var primereact_tooltip__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! primereact/tooltip */ "./node_modules/primereact/tooltip/tooltip.esm.js");
+/* harmony import */ var _Components_Toast__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/Components/Toast */ "./resources/js/Components/Toast.jsx");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _inertiajs_inertia_react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @inertiajs/inertia-react */ "./node_modules/@inertiajs/inertia-react/dist/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -2159,6 +2163,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+
+
 
 
 
@@ -2221,10 +2228,12 @@ var basicOptions = {
 };
 function BasecampActivities(_ref) {
   var result = _ref.result,
-      searchDate = _ref.searchDate;
+      searchDate = _ref.searchDate,
+      props = _ref.props;
   var id = result.id,
       campfires = result.campfires,
       activities = result.activities;
+  var toast = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
   var from = searchDate.from,
       to = searchDate.to;
 
@@ -2273,7 +2282,7 @@ function BasecampActivities(_ref) {
     var endDate = new Date(minDate + 7 * 24 * 60 * 60 * 1000);
 
     var _loop = function _loop() {
-      var label = "".concat(moment__WEBPACK_IMPORTED_MODULE_3___default()(startDate).format("ll"), " - ").concat(moment__WEBPACK_IMPORTED_MODULE_3___default()(endDate).format("ll"));
+      var label = "".concat(moment__WEBPACK_IMPORTED_MODULE_5___default()(startDate).format("ll"), " - ").concat(moment__WEBPACK_IMPORTED_MODULE_5___default()(endDate).format("ll"));
       var num = 0;
       campfires.map(function (val) {
         var d = new Date(val.created_at).getTime();
@@ -2308,7 +2317,7 @@ function BasecampActivities(_ref) {
     var endDate = new Date(minDate + 7 * 24 * 60 * 60 * 1000);
 
     var _loop2 = function _loop2() {
-      var label = "".concat(moment__WEBPACK_IMPORTED_MODULE_3___default()(startDate).format("ll"), " - ").concat(moment__WEBPACK_IMPORTED_MODULE_3___default()(endDate).format("ll"));
+      var label = "".concat(moment__WEBPACK_IMPORTED_MODULE_5___default()(startDate).format("ll"), " - ").concat(moment__WEBPACK_IMPORTED_MODULE_5___default()(endDate).format("ll"));
       var num = 0;
       activities.map(function (val) {
         var d = new Date(val.created_at).getTime();
@@ -2334,30 +2343,46 @@ function BasecampActivities(_ref) {
       datasets: [datasets]
     });
   }, [activities]);
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
+
+  var onEmailClick = function onEmailClick(e) {
+    e.preventDefault();
+    axios__WEBPACK_IMPORTED_MODULE_7___default().get("/basecamp/email?id=".concat(id, "&from=").concat(from.toISOString(), "&to=").concat(to.toISOString(), "&type=").concat(type), {
+      headers: {
+        xsrfHeaderName: props.csrf_token
+      }
+    }).then(function (res) {
+      return toast.current.show(res.data.msg);
+    })["catch"](function (err) {
+      return console.log(err);
+    });
+  };
+
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
     className: "tw-py-12",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_Components_Toast__WEBPACK_IMPORTED_MODULE_4__["default"], {
+      ref: toast
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
       className: "tw-max-w-7xl tw-mx-auto tw-px-3 lg:tw-px-8 tw-mb-5",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
         className: "tw-bg-white tw-overflow-hidden tw-shadow-sm tw-rounded-lg",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
           className: "tw-p-4 lg:tw-p-5 tw-bg-white tw-border-b tw-border-gray-200 tw-text-center",
           children: "Basecamp Activities"
         })
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
       className: "tw-max-w-7xl tw-mx-auto tw-px-3 lg:tw-px-8",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
         className: "tw-bg-white tw-overflow-hidden tw-shadow-sm tw-rounded-lg",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
           className: "tw-p-5 lg:tw-p-8 tw-bg-white tw-border-gray-200",
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
             className: "tw-border tw-rounded tw-px-5 tw-py-10 lg:tw-p-10",
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
               className: "tw-flex tw-justify-end tw-mb-8",
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                 className: "",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(primereact_dropdown__WEBPACK_IMPORTED_MODULE_1__.Dropdown, {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(primereact_dropdown__WEBPACK_IMPORTED_MODULE_1__.Dropdown, {
                   value: selectedReport,
                   options: reportType,
                   onChange: function onChange(e) {
@@ -2368,42 +2393,42 @@ function BasecampActivities(_ref) {
                   className: "tw-w-52"
                 })
               })
-            }), selectedReport === "table" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
+            }), selectedReport === "table" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
               className: " xl:tw-grid xl:tw-grid-cols-2 tw-gap-4",
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                 className: "tw-w-full tw-mt-5 tw-relative",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
                   className: "tw-border tw-rounded-lg tw-border-slate-400 tw-h-96 tw-overflow-auto block",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "tw-sticky tw-top-0  tw-text-center tw-p-6 tw-bg-white tw-z-50",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("h2", {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("h2", {
                       className: "",
                       children: "Basecamp Campfire"
                     })
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "tw-bg-white",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("table", {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("table", {
                       className: "tw-border-collapse  tw-w-full",
-                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("thead", {
+                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("thead", {
                         className: "tw-sticky tw-top-16 tw-bg-white",
-                        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("tr", {
+                        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("tr", {
                           className: "tw-border-b tw-border-slate-300",
-                          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("th", {
+                          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("th", {
                             className: "tw-p-3 tw-w-4/12",
                             children: "Date Range"
-                          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("th", {
+                          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("th", {
                             className: "tw-p-3 tw-w-4/12",
                             children: "Post Count"
                           })]
                         })
-                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("tbody", {
+                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("tbody", {
                         children: basicData.labels.map(function (val, index) {
-                          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("tr", {
+                          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("tr", {
                             className: "tw-border-b tw-border-slate-300",
-                            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("td", {
+                            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("td", {
                               className: "tw-p-3 ",
                               children: val
-                            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("td", {
+                            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("td", {
                               className: "tw-p-3  tw-text-center",
                               children: basicData.datasets[0].data[index]
                             })]
@@ -2413,40 +2438,40 @@ function BasecampActivities(_ref) {
                     })
                   })]
                 })
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                 className: "tw-w-full tw-mt-5 tw-relative",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
                   className: "tw-border tw-rounded-lg tw-border-slate-400 tw-h-96 tw-overflow-auto block",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "tw-sticky tw-top-0  tw-text-center tw-p-6 tw-bg-white tw-z-50",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("h2", {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("h2", {
                       className: "",
                       children: "Basecamp Check-Ins"
                     })
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "tw-bg-white",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("table", {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("table", {
                       className: "tw-border-collapse  tw-w-full",
-                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("thead", {
+                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("thead", {
                         className: "tw-sticky tw-top-16 tw-bg-white",
-                        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("tr", {
+                        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("tr", {
                           className: "tw-border-b tw-border-slate-300",
-                          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("th", {
+                          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("th", {
                             className: "tw-p-3 tw-w-4/12",
                             children: "Date Range"
-                          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("th", {
+                          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("th", {
                             className: "tw-p-3 tw-w-4/12",
                             children: "Check-In Post"
                           })]
                         })
-                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("tbody", {
+                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("tbody", {
                         children: basicData2.labels.map(function (val, index) {
-                          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("tr", {
+                          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("tr", {
                             className: "tw-border-b tw-border-slate-300",
-                            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("td", {
+                            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("td", {
                               className: "tw-p-3 ",
                               children: val
-                            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("td", {
+                            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("td", {
                               className: "tw-p-3  tw-text-center",
                               children: basicData2.datasets[0].data[index]
                             })]
@@ -2457,40 +2482,40 @@ function BasecampActivities(_ref) {
                   })]
                 })
               })]
-            }) : selectedReport === "histogram" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
+            }) : selectedReport === "histogram" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
               className: " xl:tw-grid xl:tw-grid-cols-2 tw-gap-4",
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                 className: "tw-w-full tw-mt-5",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
                   className: "tw-border tw-rounded-lg tw-border-slate-400",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "tw-my-4 tw-text-center tw-p-2",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("h2", {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("h2", {
                       className: "",
                       children: "Basecamp Campfire"
                     })
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(primereact_chart__WEBPACK_IMPORTED_MODULE_2__.Chart, {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(primereact_chart__WEBPACK_IMPORTED_MODULE_2__.Chart, {
                       type: "bar",
                       data: basicData,
                       options: basicOptions
                     })
                   })]
                 })
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                 className: "tw-w-full tw-mt-5",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
                   className: "tw-border tw-rounded-lg tw-border-slate-400",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "tw-my-4 tw-text-center tw-p-2",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("h2", {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("h2", {
                       className: "",
                       children: "Basecamp Check-Ins"
                     })
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(primereact_chart__WEBPACK_IMPORTED_MODULE_2__.Chart, {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(primereact_chart__WEBPACK_IMPORTED_MODULE_2__.Chart, {
                       type: "bar",
                       data: basicData2,
                       options: basicOptions
@@ -2498,40 +2523,40 @@ function BasecampActivities(_ref) {
                   })]
                 })
               })]
-            }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
+            }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
               className: " xl:tw-grid xl:tw-grid-cols-2 tw-gap-4",
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                 className: "tw-w-full tw-mt-5",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
                   className: "tw-border tw-rounded-lg tw-border-slate-400",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "tw-my-4 tw-text-center tw-p-2",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("h2", {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("h2", {
                       className: "",
                       children: "Basecamp Campfire"
                     })
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(primereact_chart__WEBPACK_IMPORTED_MODULE_2__.Chart, {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(primereact_chart__WEBPACK_IMPORTED_MODULE_2__.Chart, {
                       type: "line",
                       data: basicData,
                       options: basicOptions
                     })
                   })]
                 })
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                 className: "tw-w-full tw-mt-5",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
                   className: "tw-border tw-rounded-lg tw-border-slate-400",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "tw-my-4 tw-text-center tw-p-2",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("h2", {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("h2", {
                       className: "",
                       children: "Basecamp Check-Ins"
                     })
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(primereact_chart__WEBPACK_IMPORTED_MODULE_2__.Chart, {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(primereact_chart__WEBPACK_IMPORTED_MODULE_2__.Chart, {
                       type: "line",
                       data: basicData2,
                       options: basicOptions
@@ -2540,11 +2565,11 @@ function BasecampActivities(_ref) {
                 })
               })]
             })]
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
             className: "tw-mt-5 tw-flex tw-items-center tw-justify-end tw-p-5",
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
               className: "tw-mx-3",
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(primereact_dropdown__WEBPACK_IMPORTED_MODULE_1__.Dropdown, {
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(primereact_dropdown__WEBPACK_IMPORTED_MODULE_1__.Dropdown, {
                 value: type,
                 options: TYPES,
                 onChange: function onChange(e) {
@@ -2553,26 +2578,36 @@ function BasecampActivities(_ref) {
                 placeholder: "Select Ext",
                 optionLabel: "name"
               })
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
               className: "",
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("span", {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("span", {
                 className: "tw-mx-2",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("a", {
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(primereact_tooltip__WEBPACK_IMPORTED_MODULE_3__.Tooltip, {
+                  target: ".fa-download",
+                  mouseTrack: true,
+                  mouseTrackLeft: 10
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("a", {
                   href: "/basecamp/download?id=".concat(id, "&from=").concat(from.toISOString(), "&to=").concat(to.toISOString(), "&type=").concat(type),
                   download: true,
-                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("i", {
-                    className: "fa fa-download text-2xl"
+                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("i", {
+                    className: "fa fa-download tw-text-3xl",
+                    "data-pr-tooltip": "Download"
                   })
-                })
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("span", {
+                })]
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("span", {
                 className: "tw-mx-2",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_inertiajs_inertia_react__WEBPACK_IMPORTED_MODULE_4__.Link, {
-                  href: "/basecamp/email?id=".concat(id, "&from=").concat(from.toISOString(), "&to=").concat(to.toISOString(), "&type=").concat(type),
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(primereact_tooltip__WEBPACK_IMPORTED_MODULE_3__.Tooltip, {
+                  target: ".fa-envelope ",
+                  mouseTrack: true,
+                  mouseTrackLeft: 10
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_inertiajs_inertia_react__WEBPACK_IMPORTED_MODULE_6__.Link, {
+                  onClick: onEmailClick,
                   type: "button",
-                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("i", {
-                    className: "fa fa-envelope text-2xl"
+                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("i", {
+                    className: "fa fa-envelope tw-text-3xl",
+                    "data-pr-tooltip": "Email"
                   })
-                })
+                })]
               })]
             })]
           })]
@@ -2610,7 +2645,7 @@ function Button(_ref) {
       onClick = _ref$onClick === void 0 ? function () {} : _ref$onClick;
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("button", {
     type: type,
-    className: "tw-px-4 tw-py-2 tw-bg-gray-900 tw-border tw-border-transparent tw-rounded-md tw-font-semibold tw-text-xs tw-text-white tw-uppercase tw-tracking-widest active:tw-bg-gray-900 tw-transition tw-ease-in-out text-center tw-duration-150 ".concat(processing && "tw-opacity-25", " ") + className,
+    className: "tw-px-4 tw-py-2 tw-bg-gray-900 tw-border tw-border-transparent tw-rounded-md tw-font-semibold tw-text-xs tw-text-white tw-uppercase tw-tracking-widest active:tw-bg-gray-900 tw-transition tw-ease-in-out text-center tw-duration-150 hover:tw-bg-gray-700 ".concat(processing && "tw-opacity-25", " ") + className,
     disabled: processing,
     onClick: onClick,
     children: children
@@ -3035,8 +3070,28 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var primereact_dropdown__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! primereact/dropdown */ "./node_modules/primereact/dropdown/dropdown.esm.js");
 /* harmony import */ var primereact_chart__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! primereact/chart */ "./node_modules/primereact/chart/chart.esm.js");
-/* harmony import */ var _inertiajs_inertia_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @inertiajs/inertia-react */ "./node_modules/@inertiajs/inertia-react/dist/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var primereact_tooltip__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! primereact/tooltip */ "./node_modules/primereact/tooltip/tooltip.esm.js");
+/* harmony import */ var _Components_Toast__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/Components/Toast */ "./resources/js/Components/Toast.jsx");
+/* harmony import */ var _inertiajs_inertia_react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @inertiajs/inertia-react */ "./node_modules/@inertiajs/inertia-react/dist/index.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -3048,6 +3103,10 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+
+
+
 
 
 
@@ -3109,9 +3168,13 @@ var basicOptions = {
 };
 function LmsActivities(_ref) {
   var result = _ref.result,
-      searchDate = _ref.searchDate;
+      searchDate = _ref.searchDate,
+      props = _ref.props;
   var id = result.id,
-      campfires = result.campfires;
+      name = result.name,
+      email = result.email,
+      lms = result.lms;
+  var toast = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
   var from = searchDate.from,
       to = searchDate.to;
 
@@ -3126,41 +3189,145 @@ function LmsActivities(_ref) {
       setSelectedReport = _useState4[1];
 
   var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
-    labels: ["January", "February", "March", "April", "May", "June", "July", "August", "September"],
+    labels: [],
     datasets: [{
-      label: "My Second dataset",
+      label: "Campfires dataset",
       backgroundColor: "#FFA726",
-      data: [28, 48, 40, 19, 86, 27, 90, 20, 30],
+      data: [],
       borderColor: "#FFA726"
     }]
   }),
-      _useState6 = _slicedToArray(_useState5, 1),
-      basicData = _useState6[0];
+      _useState6 = _slicedToArray(_useState5, 2),
+      basicData = _useState6[0],
+      setBasicData = _useState6[1];
 
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+  var _useState7 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
+    labels: [],
+    datasets: [{
+      label: "Check Ins dataset",
+      backgroundColor: "#42A5F5",
+      data: [],
+      borderColor: "#42A5F5"
+    }]
+  }),
+      _useState8 = _slicedToArray(_useState7, 2),
+      basicData2 = _useState8[0],
+      setBasicData2 = _useState8[1];
+
+  react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
+    var labels = basicData.labels;
+    var datasets = basicData.datasets[0];
+    var minDate = from.getTime();
+    var maxDate = to.getTime();
+    var startDate = minDate;
+    var endDate = new Date(minDate + 7 * 24 * 60 * 60 * 1000);
+
+    var _loop = function _loop() {
+      var label = "".concat(moment__WEBPACK_IMPORTED_MODULE_6___default()(startDate).format("ll"), " - ").concat(moment__WEBPACK_IMPORTED_MODULE_6___default()(endDate).format("ll"));
+      var num = 0;
+      lms.map(function (val) {
+        if (val.item_type === "lp_lesson") {
+          var d = new Date(val.end_time).getTime();
+
+          if (d >= startDate && d <= endDate.getTime()) {
+            num++;
+          }
+        }
+      });
+      datasets = _objectSpread(_objectSpread({}, datasets), {}, {
+        data: [].concat(_toConsumableArray(datasets.data), [num])
+      });
+      labels.push(label);
+      startDate = endDate.getTime();
+      endDate = new Date(endDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+    };
+
+    do {
+      _loop();
+    } while (endDate.getTime() < maxDate);
+
+    setBasicData({
+      labels: labels,
+      datasets: [datasets]
+    });
+  }, [lms]);
+  react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
+    var labels = basicData2.labels;
+    var datasets = basicData2.datasets[0];
+    var minDate = from.getTime();
+    var maxDate = to.getTime();
+    var startDate = minDate;
+    var endDate = new Date(minDate + 7 * 24 * 60 * 60 * 1000);
+
+    var _loop2 = function _loop2() {
+      var label = "".concat(moment__WEBPACK_IMPORTED_MODULE_6___default()(startDate).format("ll"), " - ").concat(moment__WEBPACK_IMPORTED_MODULE_6___default()(endDate).format("ll"));
+      var num = 0;
+      lms.map(function (val) {
+        if (val.item_type === "lp_quiz") {
+          var d = new Date(val.end_time).getTime();
+
+          if (d >= startDate && d <= endDate.getTime()) {
+            num++;
+          }
+        }
+      });
+      datasets = _objectSpread(_objectSpread({}, datasets), {}, {
+        data: [].concat(_toConsumableArray(datasets.data), [num])
+      });
+      labels.push(label);
+      startDate = endDate.getTime();
+      endDate = new Date(endDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+    };
+
+    do {
+      _loop2();
+    } while (endDate.getTime() < maxDate);
+
+    setBasicData2({
+      labels: labels,
+      datasets: [datasets]
+    });
+  }, [lms]);
+
+  var onEmailClick = function onEmailClick(e) {
+    e.preventDefault();
+    axios__WEBPACK_IMPORTED_MODULE_7___default().get("/lms/email?email=".concat(email, "&name=").concat(name, "&from=").concat(from.toISOString(), "&to=").concat(to.toISOString(), "&type=").concat(type), {
+      headers: {
+        xsrfHeaderName: props.csrf_token
+      }
+    }).then(function (res) {
+      return toast.current.show(res.data.msg);
+    })["catch"](function (err) {
+      return console.log(err);
+    });
+  };
+
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
     className: "tw-py-12",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_Components_Toast__WEBPACK_IMPORTED_MODULE_4__["default"], {
+      ref: toast
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
       className: "tw-max-w-7xl tw-mx-auto tw-px-3 lg:tw-px-8 tw-mb-5",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
         className: "tw-bg-white tw-overflow-hidden tw-shadow-sm tw-rounded-lg",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
           className: "tw-p-4 lg:tw-p-5 tw-bg-white tw-border-b tw-border-gray-200 tw-text-center",
           children: "LMS Activities"
         })
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
       className: "tw-max-w-7xl tw-mx-auto tw-px-3 lg:tw-px-8",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
         className: "tw-bg-white tw-overflow-hidden tw-shadow-sm tw-rounded-lg",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
           className: "tw-p-5 lg:tw-p-8 tw-bg-white tw-border-gray-200",
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
             className: "tw-border tw-rounded tw-px-5 tw-py-10 lg:tw-p-10",
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
               className: "tw-flex tw-justify-end tw-mb-8",
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                 className: "",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(primereact_dropdown__WEBPACK_IMPORTED_MODULE_1__.Dropdown, {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(primereact_dropdown__WEBPACK_IMPORTED_MODULE_1__.Dropdown, {
                   value: selectedReport,
                   options: reportType,
                   onChange: function onChange(e) {
@@ -3171,42 +3338,42 @@ function LmsActivities(_ref) {
                   className: "tw-w-52"
                 })
               })
-            }), selectedReport === "table" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+            }), selectedReport === "table" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
               className: " xl:tw-grid xl:tw-grid-cols-2 tw-gap-4",
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                 className: "tw-w-full tw-mt-5 tw-relative",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
                   className: "tw-border tw-rounded-lg tw-border-slate-400 tw-h-96 tw-overflow-auto block",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "tw-sticky tw-top-0  tw-text-center tw-p-6 tw-bg-white tw-z-50",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("h2", {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("h2", {
                       className: "",
                       children: "LMS Completed Videos"
                     })
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "tw-bg-white",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("table", {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("table", {
                       className: "tw-border-collapse tw-w-full",
-                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("thead", {
+                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("thead", {
                         className: "tw-sticky tw-top-16 tw-bg-white",
-                        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("tr", {
+                        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("tr", {
                           className: "tw-border-b tw-border-slate-300",
-                          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("th", {
+                          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("th", {
                             className: "tw-p-3 tw-w-4/12 ",
                             children: "Date Range"
-                          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("th", {
+                          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("th", {
                             className: "tw-p-3 tw-w-4/12",
                             children: "Video Count"
                           })]
                         })
-                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("tbody", {
+                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("tbody", {
                         children: basicData.labels.map(function (val, index) {
-                          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("tr", {
+                          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("tr", {
                             className: "tw-border-b tw-border-slate-300",
-                            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("td", {
+                            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("td", {
                               className: "tw-p-3 ",
                               children: val
-                            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("td", {
+                            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("td", {
                               className: "tw-p-3  tw-text-center",
                               children: basicData.datasets[0].data[index]
                             })]
@@ -3216,42 +3383,42 @@ function LmsActivities(_ref) {
                     })
                   })]
                 })
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                 className: "tw-w-full tw-mt-5",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
                   className: "tw-border tw-rounded-lg tw-border-slate-400 tw-bg-white tw-h-96 tw-overflow-auto block",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "tw-sticky tw-top-0 tw-text-center tw-p-6 tw-bg-white tw-z-50",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("h2", {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("h2", {
                       className: "",
                       children: "LMS Completed Quizzes"
                     })
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "tw-bg-white",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("table", {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("table", {
                       className: "tw-border-collapse  tw-w-full",
-                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("thead", {
+                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("thead", {
                         className: "tw-sticky tw-top-16 tw-bg-white",
-                        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("tr", {
+                        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("tr", {
                           className: "tw-border-b tw-border-slate-300",
-                          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("th", {
+                          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("th", {
                             className: "tw-p-3 tw-w-4/12 ",
                             children: "Date Range"
-                          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("th", {
+                          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("th", {
                             className: "tw-p-3 tw-w-4/12",
                             children: "Quiz Count"
                           })]
                         })
-                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("tbody", {
-                        children: basicData.labels.map(function (val, index) {
-                          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("tr", {
+                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("tbody", {
+                        children: basicData2.labels.map(function (val, index) {
+                          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("tr", {
                             className: "tw-border-b tw-border-slate-300",
-                            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("td", {
+                            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("td", {
                               className: "tw-p-3 ",
                               children: val
-                            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("td", {
+                            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("td", {
                               className: "tw-p-3  tw-text-center",
-                              children: basicData.datasets[0].data[index]
+                              children: basicData2.datasets[0].data[index]
                             })]
                           }, index);
                         })
@@ -3260,94 +3427,94 @@ function LmsActivities(_ref) {
                   })]
                 })
               })]
-            }) : selectedReport === "histogram" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+            }) : selectedReport === "histogram" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
               className: " xl:tw-grid xl:tw-grid-cols-2 tw-gap-4",
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                 className: "tw-w-full tw-mt-5",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
                   className: "tw-border tw-rounded-lg tw-border-slate-400",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "tw-my-4 tw-text-center tw-p-2",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("h2", {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("h2", {
                       className: "",
                       children: "LMS Completed Videos"
                     })
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(primereact_chart__WEBPACK_IMPORTED_MODULE_2__.Chart, {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(primereact_chart__WEBPACK_IMPORTED_MODULE_2__.Chart, {
                       type: "bar",
                       data: basicData,
                       options: basicOptions
                     })
                   })]
                 })
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                 className: "tw-w-full tw-mt-5",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
                   className: "tw-border tw-rounded-lg tw-border-slate-400",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "tw-my-4 tw-text-center tw-p-2",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("h2", {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("h2", {
                       className: "",
                       children: "LMS Completed Quizzes"
                     })
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(primereact_chart__WEBPACK_IMPORTED_MODULE_2__.Chart, {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(primereact_chart__WEBPACK_IMPORTED_MODULE_2__.Chart, {
                       type: "bar",
-                      data: basicData,
+                      data: basicData2,
                       options: basicOptions
                     })
                   })]
                 })
               })]
-            }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+            }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
               className: " xl:tw-grid xl:tw-grid-cols-2 tw-gap-4",
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                 className: "tw-w-full tw-mt-5",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
                   className: "tw-border tw-rounded-lg tw-border-slate-400",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "tw-my-4 tw-text-center tw-p-2",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("h2", {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("h2", {
                       className: "",
                       children: "LMS Completed Videos"
                     })
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(primereact_chart__WEBPACK_IMPORTED_MODULE_2__.Chart, {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(primereact_chart__WEBPACK_IMPORTED_MODULE_2__.Chart, {
                       type: "line",
                       data: basicData,
                       options: basicOptions
                     })
                   })]
                 })
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                 className: "tw-w-full tw-mt-5",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
                   className: "tw-border tw-rounded-lg tw-border-slate-400",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "tw-my-4 tw-text-center tw-p-2",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("h2", {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("h2", {
                       className: "",
                       children: "LMS Completed Quizzes"
                     })
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
                     className: "",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(primereact_chart__WEBPACK_IMPORTED_MODULE_2__.Chart, {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(primereact_chart__WEBPACK_IMPORTED_MODULE_2__.Chart, {
                       type: "line",
-                      data: basicData,
+                      data: basicData2,
                       options: basicOptions
                     })
                   })]
                 })
               })]
             })]
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
             className: "tw-mt-5 tw-flex tw-items-center tw-justify-end tw-p-5",
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
               className: "tw-mx-3",
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(primereact_dropdown__WEBPACK_IMPORTED_MODULE_1__.Dropdown, {
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(primereact_dropdown__WEBPACK_IMPORTED_MODULE_1__.Dropdown, {
                 value: type,
                 options: TYPES,
                 onChange: function onChange(e) {
@@ -3356,25 +3523,35 @@ function LmsActivities(_ref) {
                 placeholder: "Select Ext",
                 optionLabel: "name"
               })
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
               className: "",
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("span", {
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("span", {
                 className: "tw-mx-2",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("a", {
-                  href: "/basecamp/download?id=".concat(id, "&from=").concat(from.toISOString(), "&to=").concat(to.toISOString(), "&type=").concat(type),
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(primereact_tooltip__WEBPACK_IMPORTED_MODULE_3__.Tooltip, {
+                  target: ".fa-download",
+                  mouseTrack: true,
+                  mouseTrackLeft: 10
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("a", {
+                  href: "/lms/download?email=".concat(email, "&name=").concat(name, "&from=").concat(from.toISOString(), "&to=").concat(to.toISOString(), "&type=").concat(type),
                   download: true,
-                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("i", {
-                    className: "fa fa-download text-2xl"
+                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("i", {
+                    className: "fa fa-download tw-text-3xl",
+                    "data-pr-tooltip": "Download"
                   })
-                })
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("span", {
+                })]
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("span", {
                 className: "tw-mx-2",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_inertiajs_inertia_react__WEBPACK_IMPORTED_MODULE_3__.Link, {
-                  href: "/basecamp/email?id=".concat(id, "&from=").concat(from.toISOString(), "&to=").concat(to.toISOString(), "&type=").concat(type),
-                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("i", {
-                    className: "fa fa-envelope text-2xl"
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(primereact_tooltip__WEBPACK_IMPORTED_MODULE_3__.Tooltip, {
+                  target: ".fa-envelope ",
+                  mouseTrack: true,
+                  mouseTrackLeft: 10
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_inertiajs_inertia_react__WEBPACK_IMPORTED_MODULE_5__.Link, {
+                  onClick: onEmailClick,
+                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("i", {
+                    className: "fa fa-envelope tw-text-3xl",
+                    "data-pr-tooltip": "Email"
                   })
-                })
+                })]
               })]
             })]
           })]
@@ -3513,16 +3690,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 
 
+
 function ProfileAvatar(_ref) {
   var source = _ref.source,
       _ref$handleOnClick = _ref.handleOnClick,
-      handleOnClick = _ref$handleOnClick === void 0 ? function () {} : _ref$handleOnClick;
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("img", {
+      handleOnClick = _ref$handleOnClick === void 0 ? function () {} : _ref$handleOnClick,
+      _ref$isEdit = _ref.isEdit,
+      isEdit = _ref$isEdit === void 0 ? false : _ref$isEdit;
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
+    className: "tw-relative ".concat(isEdit && "tw-cursor-pointer hover:tw-opacity-80"),
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("img", {
       src: source || "/images/no_img.png",
-      className: "tw-rounded-full tw-w-52 tw-h-52",
+      className: "tw-rounded-full tw-w-52 tw-h-52 ",
       onClick: handleOnClick
-    })
+    }), isEdit && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
+      className: "tw-absolute tw-bottom-0 tw-right-5",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("span", {
+        className: "fa fa-camera tw-text-3xl "
+      })
+    })]
   });
 }
 
@@ -4710,7 +4896,11 @@ function Dashboard(props) {
       activeIndex = _React$useState8[0],
       setActiveIndex = _React$useState8[1];
 
-  var _React$useState9 = react__WEBPACK_IMPORTED_MODULE_0__.useState(null),
+  var _React$useState9 = react__WEBPACK_IMPORTED_MODULE_0__.useState({
+    campfires: [],
+    activities: [],
+    lms: []
+  }),
       _React$useState10 = _slicedToArray(_React$useState9, 2),
       searchResult = _React$useState10[0],
       setSearchResult = _React$useState10[1];
@@ -4725,7 +4915,23 @@ function Dashboard(props) {
 
     axios.get("/api/basecamp/search?id=".concat(selectedCand.id, "&from=").concat(from.toISOString(), "&to=").concat(to.toISOString())).then(function (res) {
       // console.log(res.data);
-      setSearchResult(_objectSpread(_objectSpread({}, selectedCand), res.data));
+      setSearchResult(_objectSpread(_objectSpread(_objectSpread({}, searchResult), selectedCand), res.data));
+      return axios.get("https://mytritek.co.uk/wp-json/my-lpa/v1/user-progress", {
+        email: selectedCand.email
+      });
+    }).then(function (res) {
+      var minDate = from.getTime();
+      var maxDate = to.getTime();
+      var lms = res.data.filter(function (val) {
+        var d = new Date(val.end_time).getTime();
+
+        if (val.status === "completed" && d >= minDate && d <= maxDate) {
+          return val;
+        }
+      });
+      setSearchResult(_objectSpread(_objectSpread(_objectSpread({}, searchResult), selectedCand), {}, {
+        lms: lms
+      }));
     })["catch"](function (err) {
       return console.log(err);
     });
@@ -4736,6 +4942,15 @@ function Dashboard(props) {
       toast.current.show(props.status);
     }
   }, [props.status]);
+  react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
+    if (!selectedCand) {
+      setSearchResult({
+        campfires: [],
+        activities: [],
+        lms: []
+      });
+    }
+  }, [selectedCand]);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)(_Layouts_Authenticated__WEBPACK_IMPORTED_MODULE_1__["default"], {
     auth: props.auth,
     errors: props.errors,
@@ -4752,10 +4967,12 @@ function Dashboard(props) {
         }
       }), activeIndex === 1 ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_Components_BasecampActivities__WEBPACK_IMPORTED_MODULE_8__["default"], {
         result: searchResult,
-        searchDate: date
+        searchDate: date,
+        props: props
       }) : activeIndex === 2 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_Components_LmsActivities__WEBPACK_IMPORTED_MODULE_9__["default"], {
         result: searchResult,
-        searchDate: date
+        searchDate: date,
+        props: props
       })]
     }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)("div", {
       className: "tw-py-12",
@@ -4865,7 +5082,7 @@ function Dashboard(props) {
               })]
             })
           })
-        }), searchResult && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)("div", {
+        }), searchResult.id && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)("div", {
           className: "tw-bg-white tw-overflow-hidden tw-shadow-sm tw-rounded-lg tw-mt-10",
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)("div", {
             className: "tw-p-6 lg:tw-p-10 tw-bg-white tw-border-b tw-border-gray-200 tw-flex tw-items-center tw-flex-col tw-justify-center",
@@ -4943,12 +5160,16 @@ function Dashboard(props) {
                         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)("tr", {
                           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)("td", {
                             className: "tw-border tw-border-slate-300 lg:tw-w-96 tw-p-3 tw-w-full tw-text-center",
-                            children: "(0) Total Number of\n                                                                LMS completed\n                                                                Videos watched"
+                            children: "(".concat(searchResult.lms.filter(function (val) {
+                              return val.item_type === "lp_lesson";
+                            }).length, ") Total Number of\n                                                                LMS completed\n                                                                Videos watched")
                           })
                         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)("tr", {
                           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)("td", {
                             className: "tw-border tw-border-slate-300 lg:tw-w-96 tw-p-3 tw-w-full tw-text-center",
-                            children: "(0) Total\n                                                                        Number\n                                                                        of LMS\n                                                                        completed\n                                                                        Quizzes"
+                            children: "(".concat(searchResult.lms.filter(function (val) {
+                              return val.item_type === "lp_quiz";
+                            }).length, ") Total\n                                                                        Number\n                                                                        of LMS\n                                                                        completed\n                                                                        Quizzes")
                           })
                         })]
                       })
@@ -5356,7 +5577,8 @@ var Profile = function Profile(_ref) {
                   className: "tw-flex tw-flex-col tw-items-center",
                   children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_Components_ProfileAvatar__WEBPACK_IMPORTED_MODULE_5__["default"], {
                     handleOnClick: handleOnClick,
-                    source: data.avatar ? URL.createObjectURL(data.avatar) : user.avatar
+                    source: data.avatar ? URL.createObjectURL(data.avatar) : "".concat(user.avatar, "?").concat(new Date().getTime()),
+                    isEdit: true
                   }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("input", {
                     type: "file",
                     onChange: function onChange(e) {

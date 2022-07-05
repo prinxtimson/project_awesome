@@ -29,23 +29,19 @@ class CheckInsExport implements FromArray, WithMapping, ShouldAutoSize, WithHead
     public function array(): array
     {
 
-        $activities =  Cache::get('bc_activities');
-
-        if(is_null($activities)){
-            $activities = [];
-        }
+        $activities =  Cache::get('bc_activities', []);
         
-        $filter_activities = array_filter($activities, function($val) {
-            if($val['creator']['id'] == $this->id && $val['kind'] === 'question_answer_created'){
-                return $val;
-            }
-        });
+        $filter_activities = [];
 
-        $filter_activities = array_filter($filter_activities, function($value) {
-            if($value['created_at'] >= $this->from && $value['created_at'] <= $this->to){
-                return $value;
+        foreach(array_chunk($activities, 500) as $activities_chunk){
+            foreach($activities_chunk as $val){
+                if($val['creator']['id'] == $this->id && $val['kind'] === 'question_answer_created'){
+                    if($val['created_at'] >= $this->from && $val['created_at'] <= $this->to){
+                        array_push($filter_activities, $val);
+                    }  
+                }
             }
-        });  
+        }
 
         return $filter_activities;
     }

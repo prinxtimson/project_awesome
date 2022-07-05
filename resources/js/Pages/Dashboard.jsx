@@ -32,7 +32,11 @@ export default function Dashboard(props) {
     });
     const [selectedOpt, setSelectedOpt] = React.useState("all");
     const [activeIndex, setActiveIndex] = React.useState(0);
-    const [searchResult, setSearchResult] = React.useState(null);
+    const [searchResult, setSearchResult] = React.useState({
+        campfires: [],
+        activities: [],
+        lms: [],
+    });
 
     const handleSearch = (e) => {
         const { from, to } = date;
@@ -47,7 +51,38 @@ export default function Dashboard(props) {
             )
             .then((res) => {
                 // console.log(res.data);
-                setSearchResult({ ...selectedCand, ...res.data });
+                setSearchResult({
+                    ...searchResult,
+                    ...selectedCand,
+                    ...res.data,
+                });
+
+                return axios.get(
+                    "https://mytritek.co.uk/wp-json/my-lpa/v1/user-progress",
+                    {
+                        email: selectedCand.email,
+                    }
+                );
+            })
+            .then((res) => {
+                let minDate = from.getTime();
+                let maxDate = to.getTime();
+                const lms = res.data.filter((val) => {
+                    const d = new Date(val.end_time).getTime();
+                    if (
+                        val.status === "completed" &&
+                        d >= minDate &&
+                        d <= maxDate
+                    ) {
+                        return val;
+                    }
+                });
+
+                setSearchResult({
+                    ...searchResult,
+                    ...selectedCand,
+                    lms,
+                });
             })
             .catch((err) => console.log(err));
     };
@@ -57,6 +92,16 @@ export default function Dashboard(props) {
             toast.current.show(props.status);
         }
     }, [props.status]);
+
+    React.useEffect(() => {
+        if (!selectedCand) {
+            setSearchResult({
+                campfires: [],
+                activities: [],
+                lms: [],
+            });
+        }
+    }, [selectedCand]);
 
     return (
         <Authenticated auth={props.auth} errors={props.errors}>
@@ -74,12 +119,14 @@ export default function Dashboard(props) {
                         <BasecampActivities
                             result={searchResult}
                             searchDate={date}
+                            props={props}
                         />
                     ) : (
                         activeIndex === 2 && (
                             <LmsActivities
                                 result={searchResult}
                                 searchDate={date}
+                                props={props}
                             />
                         )
                     )}
@@ -191,7 +238,7 @@ export default function Dashboard(props) {
                                 </form>
                             </div>
                         </div>
-                        {searchResult && (
+                        {searchResult.id && (
                             <div className="tw-bg-white tw-overflow-hidden tw-shadow-sm tw-rounded-lg tw-mt-10">
                                 <div className="tw-p-6 lg:tw-p-10 tw-bg-white tw-border-b tw-border-gray-200 tw-flex tw-items-center tw-flex-col tw-justify-center">
                                     <div className="tw-pt-10 tw-pb-10">
@@ -274,14 +321,32 @@ export default function Dashboard(props) {
                                                             <tbody>
                                                                 <tr>
                                                                     <td className="tw-border tw-border-slate-300 lg:tw-w-96 tw-p-3 tw-w-full tw-text-center">
-                                                                        {`(0) Total Number of
+                                                                        {`(${
+                                                                            searchResult.lms.filter(
+                                                                                (
+                                                                                    val
+                                                                                ) =>
+                                                                                    val.item_type ===
+                                                                                    "lp_lesson"
+                                                                            )
+                                                                                .length
+                                                                        }) Total Number of
                                                                 LMS completed
                                                                 Videos watched`}
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td className="tw-border tw-border-slate-300 lg:tw-w-96 tw-p-3 tw-w-full tw-text-center">
-                                                                        {`(0) Total
+                                                                        {`(${
+                                                                            searchResult.lms.filter(
+                                                                                (
+                                                                                    val
+                                                                                ) =>
+                                                                                    val.item_type ===
+                                                                                    "lp_quiz"
+                                                                            )
+                                                                                .length
+                                                                        }) Total
                                                                         Number
                                                                         of LMS
                                                                         completed

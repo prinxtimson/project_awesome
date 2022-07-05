@@ -33,19 +33,19 @@ class CampfiresExport implements FromArray, WithMapping, ShouldAutoSize, WithHea
     public function array(): array
     {
 
-        $campfires =  Cache::get('bc_campfires');
+        $campfires =  Cache::get('bc_campfires', []);
 
-        $filter_campfires = array_filter($campfires, function($val) {
-            if($val['creator']['id'] == $this->id){
-                return $val;
-            }
-        });
+        $filter_campfires = [];
 
-        $filter_campfires = array_filter($filter_campfires, function($value) {
-            if($value['created_at'] >= $this->from && $value['created_at'] <= $this->to){
-                return $value;
+        foreach(array_chunk($campfires, 500) as $campfires_chunk){
+            foreach($campfires_chunk as $val){
+                if($val['creator']['id'] == $this->id){
+                    if($val['created_at'] >= $this->from && $val['created_at'] <= $this->to){
+                        array_push($filter_campfires, $val);
+                    }  
+                }
             }
-        });  
+        }
 
         return $filter_campfires;
     }

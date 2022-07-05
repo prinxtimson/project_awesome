@@ -52,6 +52,9 @@ Route::middleware(['auth'])->group(function () {
 Route::get('basecamp/download', [BasecampController::class, 'download'])->middleware(['auth']);
 Route::get('basecamp/email', [BasecampController::class, 'email'])->middleware(['auth']);
 
+Route::get('lms/download', [LmsController::class, 'download'])->middleware(['auth']);
+Route::get('lms/email', [LmsController::class, 'email'])->middleware(['auth']);
+
 Route::get('lms/download', [LmsController::class, 'download']);
 
 require __DIR__.'/auth.php';

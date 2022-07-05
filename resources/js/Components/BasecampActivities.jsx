@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { Dropdown } from "primereact/dropdown";
 import { Chart } from "primereact/chart";
+import { Tooltip } from "primereact/tooltip";
+import Toast from "@/Components/Toast";
 import moment from "moment";
 import { Link } from "@inertiajs/inertia-react";
+import axios from "axios";
 
 const reportType = [
     { name: "Table", value: "table" },
@@ -47,8 +50,9 @@ let basicOptions = {
     },
 };
 
-export default function BasecampActivities({ result, searchDate }) {
+export default function BasecampActivities({ result, searchDate, props }) {
     const { id, campfires, activities } = result;
+    const toast = React.useRef();
     const { from, to } = searchDate;
     const [type, setType] = useState("xlsx");
     const [selectedReport, setSelectedReport] = useState("table");
@@ -143,8 +147,20 @@ export default function BasecampActivities({ result, searchDate }) {
         });
     }, [activities]);
 
+    const onEmailClick = (e) => {
+        e.preventDefault();
+        axios
+            .get(
+                `/basecamp/email?id=${id}&from=${from.toISOString()}&to=${to.toISOString()}&type=${type}`,
+                { headers: { xsrfHeaderName: props.csrf_token } }
+            )
+            .then((res) => toast.current.show(res.data.msg))
+            .catch((err) => console.log(err));
+    };
+
     return (
         <div className="tw-py-12">
+            <Toast ref={toast} />
             <div className="tw-max-w-7xl tw-mx-auto tw-px-3 lg:tw-px-8 tw-mb-5">
                 <div className="tw-bg-white tw-overflow-hidden tw-shadow-sm tw-rounded-lg">
                     <div className="tw-p-4 lg:tw-p-5 tw-bg-white tw-border-b tw-border-gray-200 tw-text-center">
@@ -361,19 +377,32 @@ export default function BasecampActivities({ result, searchDate }) {
                             </div>
                             <div className="">
                                 <span className="tw-mx-2">
+                                    <Tooltip
+                                        target=".fa-download"
+                                        mouseTrack
+                                        mouseTrackLeft={10}
+                                    />
                                     <a
                                         href={`/basecamp/download?id=${id}&from=${from.toISOString()}&to=${to.toISOString()}&type=${type}`}
                                         download
                                     >
-                                        <i className="fa fa-download text-2xl"></i>
+                                        <i
+                                            className="fa fa-download tw-text-3xl"
+                                            data-pr-tooltip="Download"
+                                        ></i>
                                     </a>
                                 </span>
                                 <span className="tw-mx-2">
-                                    <Link
-                                        href={`/basecamp/email?id=${id}&from=${from.toISOString()}&to=${to.toISOString()}&type=${type}`}
-                                        type="button"
-                                    >
-                                        <i className="fa fa-envelope text-2xl"></i>
+                                    <Tooltip
+                                        target=".fa-envelope "
+                                        mouseTrack
+                                        mouseTrackLeft={10}
+                                    />
+                                    <Link onClick={onEmailClick} type="button">
+                                        <i
+                                            className="fa fa-envelope tw-text-3xl"
+                                            data-pr-tooltip="Email"
+                                        ></i>
                                     </Link>
                                 </span>
                             </div>

@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { Dropdown } from "primereact/dropdown";
 import { Chart } from "primereact/chart";
+import { Tooltip } from "primereact/tooltip";
+import Toast from "@/Components/Toast";
 import { Link } from "@inertiajs/inertia-react";
+import moment from "moment";
+import axios from "axios";
 
 const reportType = [
     { name: "Table", value: "table" },
@@ -46,35 +50,121 @@ let basicOptions = {
     },
 };
 
-export default function LmsActivities({ result, searchDate }) {
-    const { id, campfires } = result;
+export default function LmsActivities({ result, searchDate, props }) {
+    const { id, name, email, lms } = result;
+    const toast = React.useRef();
     const { from, to } = searchDate;
     const [type, setType] = useState("xlsx");
     const [selectedReport, setSelectedReport] = useState("table");
-    const [basicData] = useState({
-        labels: [
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-            "August",
-            "September",
-        ],
+    const [basicData, setBasicData] = useState({
+        labels: [],
         datasets: [
             {
-                label: "My Second dataset",
+                label: "Campfires dataset",
                 backgroundColor: "#FFA726",
-                data: [28, 48, 40, 19, 86, 27, 90, 20, 30],
+                data: [],
                 borderColor: "#FFA726",
             },
         ],
     });
+    const [basicData2, setBasicData2] = useState({
+        labels: [],
+        datasets: [
+            {
+                label: "Check Ins dataset",
+                backgroundColor: "#42A5F5",
+                data: [],
+                borderColor: "#42A5F5",
+            },
+        ],
+    });
+
+    React.useEffect(() => {
+        let labels = basicData.labels;
+        let datasets = basicData.datasets[0];
+        let minDate = from.getTime();
+        let maxDate = to.getTime();
+        let startDate = minDate;
+        let endDate = new Date(minDate + 7 * 24 * 60 * 60 * 1000);
+
+        do {
+            let label = `${moment(startDate).format("ll")} - ${moment(
+                endDate
+            ).format("ll")}`;
+            let num = 0;
+
+            lms.map((val) => {
+                if (val.item_type === "lp_lesson") {
+                    let d = new Date(val.end_time).getTime();
+                    if (d >= startDate && d <= endDate.getTime()) {
+                        num++;
+                    }
+                }
+            });
+
+            datasets = { ...datasets, data: [...datasets.data, num] };
+            labels.push(label);
+
+            startDate = endDate.getTime();
+            endDate = new Date(endDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+        } while (endDate.getTime() < maxDate);
+
+        setBasicData({
+            labels,
+            datasets: [datasets],
+        });
+    }, [lms]);
+
+    React.useEffect(() => {
+        let labels = basicData2.labels;
+        let datasets = basicData2.datasets[0];
+        let minDate = from.getTime();
+        let maxDate = to.getTime();
+        let startDate = minDate;
+        let endDate = new Date(minDate + 7 * 24 * 60 * 60 * 1000);
+
+        do {
+            let label = `${moment(startDate).format("ll")} - ${moment(
+                endDate
+            ).format("ll")}`;
+            let num = 0;
+
+            lms.map((val) => {
+                if (val.item_type === "lp_quiz") {
+                    let d = new Date(val.end_time).getTime();
+                    if (d >= startDate && d <= endDate.getTime()) {
+                        num++;
+                    }
+                }
+            });
+
+            datasets = { ...datasets, data: [...datasets.data, num] };
+            labels.push(label);
+
+            startDate = endDate.getTime();
+            endDate = new Date(endDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+        } while (endDate.getTime() < maxDate);
+
+        setBasicData2({
+            labels,
+            datasets: [datasets],
+        });
+    }, [lms]);
+
+    const onEmailClick = (e) => {
+        e.preventDefault();
+        axios
+            .get(
+                `/lms/email?email=${email}&name=${name}&from=${from.toISOString()}&to=${to.toISOString()}&type=${type}`,
+                { headers: { xsrfHeaderName: props.csrf_token } }
+            )
+            .then((res) => toast.current.show(res.data.msg))
+            .catch((err) => console.log(err));
+    };
 
     return (
         <div className="tw-py-12">
+            <Toast ref={toast} />
             <div className="tw-max-w-7xl tw-mx-auto tw-px-3 lg:tw-px-8 tw-mb-5">
                 <div className="tw-bg-white tw-overflow-hidden tw-shadow-sm tw-rounded-lg">
                     <div className="tw-p-4 lg:tw-p-5 tw-bg-white tw-border-b tw-border-gray-200 tw-text-center">
@@ -173,7 +263,7 @@ export default function LmsActivities({ result, searchDate }) {
                                                     </thead>
 
                                                     <tbody>
-                                                        {basicData.labels.map(
+                                                        {basicData2.labels.map(
                                                             (val, index) => (
                                                                 <tr
                                                                     className="tw-border-b tw-border-slate-300"
@@ -184,7 +274,7 @@ export default function LmsActivities({ result, searchDate }) {
                                                                     </td>
                                                                     <td className="tw-p-3  tw-text-center">
                                                                         {
-                                                                            basicData
+                                                                            basicData2
                                                                                 .datasets[0]
                                                                                 .data[
                                                                                 index
@@ -231,7 +321,7 @@ export default function LmsActivities({ result, searchDate }) {
                                             <div className="">
                                                 <Chart
                                                     type="bar"
-                                                    data={basicData}
+                                                    data={basicData2}
                                                     options={basicOptions}
                                                 />
                                             </div>
@@ -269,7 +359,7 @@ export default function LmsActivities({ result, searchDate }) {
                                             <div className="">
                                                 <Chart
                                                     type="line"
-                                                    data={basicData}
+                                                    data={basicData2}
                                                     options={basicOptions}
                                                 />
                                             </div>
@@ -291,18 +381,32 @@ export default function LmsActivities({ result, searchDate }) {
                             </div>
                             <div className="">
                                 <span className="tw-mx-2">
+                                    <Tooltip
+                                        target=".fa-download"
+                                        mouseTrack
+                                        mouseTrackLeft={10}
+                                    />
                                     <a
-                                        href={`/basecamp/download?id=${id}&from=${from.toISOString()}&to=${to.toISOString()}&type=${type}`}
+                                        href={`/lms/download?email=${email}&name=${name}&from=${from.toISOString()}&to=${to.toISOString()}&type=${type}`}
                                         download
                                     >
-                                        <i className="fa fa-download text-2xl"></i>
+                                        <i
+                                            className="fa fa-download tw-text-3xl"
+                                            data-pr-tooltip="Download"
+                                        ></i>
                                     </a>
                                 </span>
                                 <span className="tw-mx-2">
-                                    <Link
-                                        href={`/basecamp/email?id=${id}&from=${from.toISOString()}&to=${to.toISOString()}&type=${type}`}
-                                    >
-                                        <i className="fa fa-envelope text-2xl"></i>
+                                    <Tooltip
+                                        target=".fa-envelope "
+                                        mouseTrack
+                                        mouseTrackLeft={10}
+                                    />
+                                    <Link onClick={onEmailClick}>
+                                        <i
+                                            className="fa fa-envelope tw-text-3xl"
+                                            data-pr-tooltip="Email"
+                                        ></i>
                                     </Link>
                                 </span>
                             </div>

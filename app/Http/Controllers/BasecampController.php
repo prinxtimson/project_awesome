@@ -24,7 +24,7 @@ class BasecampController extends Controller
     public function people()
     {
 
-        $people = Cache::get('bc_people');
+        $people = Cache::get('bc_people', []);
 
         return $people;
     }
@@ -41,7 +41,7 @@ class BasecampController extends Controller
     public function campfires()
     {
 
-        $campfires = Cache::get('bc_campfires');
+        $campfires = Cache::get('bc_campfires', []);
 
         return $campfires;
     }
@@ -69,7 +69,7 @@ class BasecampController extends Controller
 
         foreach(array_chunk($activities, 500) as $activities_chunk){
             foreach($activities_chunk as $val){
-                if($val['creator']['id'] == $id){
+                if($val['creator']['id'] == $id && $val['kind'] === 'question_answer_created'){
                     if($val['created_at'] >= $from && $val['created_at'] <= $to){
                         array_push($filter_activities, $val);
                     }  
@@ -126,15 +126,15 @@ class BasecampController extends Controller
             try{
                 Mail::to($user)->send(new CandidateReport($filename, $user));
 
-                return back()->with('status', 'Email had been sent');
+                return ['msg' => 'Email had been sent'];
             }
             catch(\Exception $e){
                 error_log($e);
-                return back()->with('errors', 'An error occur.');
+                return response(['msg' => 'An error occur.'], 400);
             }
 
         }
-        return back()->with('errors', 'An error occur');
+        return response(['msg' => 'An error occur.'], 400);
         
     }
     

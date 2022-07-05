@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
@@ -15,43 +16,45 @@ use Maatwebsite\Excel\Events\AfterSheet;
 
 class VideoCountSheet implements FromArray, WithMapping, ShouldAutoSize, WithHeadings, WithEvents, WithCustomStartCell, WithTitle
 {
+    private $name;
+    private $email;
     private $from;
     private $to;
-    private $id;
 
-    public function __construct($id, $from, $to)
+    public function __construct($email, $name, $from, $to)
     {
+        $this->name = $name;
+        $this->email = $email;
         $this->from = $from;
         $this->to = $to;
-        $this->id = $id;
     }
 
     public function array()
     {
+        $res = Http::get('https://mytritek.co.uk/wp-json/my-lpa/v1/user-progress', ['email' => $this->email])->json();
+        $data = [];
 
-        $videos =  Cache::get('lms_videos');
+        foreach($res as $val){
+            $endTime = explode(' ', $val->end_time);
+            $minTime = explode('T', $this->from);
+            $maxTime = explode('T', $this->to);
 
-        $filter_videos = array_filter(array_filter($videos, function($val) {
-            if($val['creator']['id'] == $this->id){
-                return $val;
+            if($val->item_type === 'lp_lesson' && $val->status === "completed" && $endTime >= $minTime && $endTime <= $maxTime){
+                array_push($data, $val);
             }
-        }), function($value) {
-            if($value['created_at'] >= $this->from && $value['created_at'] <= $this->to){
-                return $value;
-            }
-        });
-
-        return $filter_videos;
+        }
+        return $data;
     }
 
-    public function map($videos): array
+    public function map($quiz): array
     {
 
         return [
-            Date::dateTimeToExcel($videos['created_at']),
-            $videos['bucket']['name'],
-            $videos['creator']['name'],
-            $videos['creator']['email_address'],
+            $quiz['user_item_id'],
+            $this->name,
+            $this->email,
+            $quiz['start_time'],
+            $quiz['end_time'],
         ];
     }
 
@@ -59,10 +62,11 @@ class VideoCountSheet implements FromArray, WithMapping, ShouldAutoSize, WithHea
     {
         return [
         
-            'Date',
-            'Project Name',
+            'ID',
             'Candidate Name',
-            'Email',
+            'Candidate Email',
+            'Start Time',
+            'End Time'
         ];
     }
 
@@ -70,7 +74,7 @@ class VideoCountSheet implements FromArray, WithMapping, ShouldAutoSize, WithHea
     {
         return [
             AfterSheet::class => function(AfterSheet $event) {
-                $event->sheet->getStyle('B3:E3')->applyFromArray([
+                $event->sheet->getStyle('B3:F3')->applyFromArray([
                     'font' => [
                         'bold' => true,
                     ],

@@ -194,8 +194,11 @@ const Profile = ({ auth, status, errors: propsErrors }) => {
                                                         ? URL.createObjectURL(
                                                               data.avatar
                                                           )
-                                                        : user.avatar
+                                                        : `${
+                                                              user.avatar
+                                                          }?${new Date().getTime()}`
                                                 }
+                                                isEdit={true}
                                             />
                                             <input
                                                 type="file"

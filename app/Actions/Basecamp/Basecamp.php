@@ -143,7 +143,7 @@ class Basecamp
       $next = $activities->header('Link');
       $start = 0;
 
-      while($start < 200){
+      while($start < 20){
         $next = $next;
         $next_url = trim(explode(';', $next)[0], "<>");
         $res = Http::withCookies(['_bc3_session' => $session, '_dd_s', 'bc3_identity_id' => $identity, 'bc3_session_verification_token' => $verification], '3.basecamp.com')->get($next_url);

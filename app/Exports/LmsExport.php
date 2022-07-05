@@ -9,22 +9,24 @@ class LmsExport implements WithMultipleSheets
 {
     use Exportable;
 
+    private $email;
+    private $name;
     private $from;
     private $to;
-    private $id;
 
-    public function __construct($id, $from, $to)
+    public function __construct($email, $name, $from, $to)
     {
+        $this->name = $name;
+        $this->email = $email;
         $this->from = $from;
         $this->to = $to;
-        $this->id = $id;
     }
 
     public function sheets(): array
     {
         $sheets = [
-            new VideoCountSheet($this->id, $this->from, $this->to),
-            new QuizCountSheet($this->id, $this->from, $this->to),
+            new VideoCountSheet($this->email, $this->name, $this->from, $this->to),
+            new QuizCountSheet($this->email, $this->name, $this->from, $this->to),
         ];
 
         return $sheets;
