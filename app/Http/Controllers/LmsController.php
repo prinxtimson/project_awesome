@@ -6,12 +6,21 @@ use App\Exports\LmsExport;
 use App\Mail\CandidateReport;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Excel;
 
 class LmsController extends Controller
 {
     
+    public function search(Request $request)
+    {
+        $email = $request->email;
+
+        $res = Http::get('https://mytritek.co.uk/wp-json/my-lpa/v1/user-progress', ['email' => $email])->throw()->json();
+
+        return $res;
+    }
 
     public function download(Request $request) {
         $name = $request->name;

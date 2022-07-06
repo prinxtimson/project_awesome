@@ -121,6 +121,8 @@ return [
 
     'key' => env('APP_KEY'),
 
+    'basecamp_token' => env('BASECAMP_ACCESS_TOKEN'),
+
     'cipher' => 'AES-256-CBC',
 
     /*

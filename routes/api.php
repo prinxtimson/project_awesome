@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BasecampController;
+use App\Http\Controllers\LmsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,4 +25,8 @@ Route::group(['prefix' => 'basecamp'], function() {
     Route::get('activities', [BasecampController::class, 'activities']);
     Route::get('campfires', [BasecampController::class, 'campfires']);
     Route::get('search', [BasecampController::class, 'search']);
+});
+
+Route::group(['prefix' => 'lms'], function() {
+    Route::get('search', [LmsController::class, 'search']);
 });

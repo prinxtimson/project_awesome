@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Actions\Basecamp\Basecamp;
 use App\Exports\BasecampExport;
 use App\Mail\CandidateReport;
+use App\Models\Basecamp as ModelsBasecamp;
 use Carbon\Carbon;
 use Exception;
 use Maatwebsite\Excel\Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\LazyCollection;
 
 class BasecampController extends Controller
 {
@@ -36,6 +38,13 @@ class BasecampController extends Controller
         $activities = $basecamp->getAllActivities();
 
         return $activities;
+        // $activities = ModelsBasecamp::where('type', 'activities')->first();
+
+        // return json_decode($activities->data, true);
+
+        // $campfires = LazyCollection::make(Cache::get('bc_activities', []))->all();
+
+        // return $campfires;
     }
 
     public function campfires()
@@ -52,7 +61,7 @@ class BasecampController extends Controller
         $id = $request->id;
 
         $campfires = Cache::get('bc_campfires', []);
-        $activities = Cache::get('bc_activities', []);
+        $activities = ModelsBasecamp::where('type', 'activities')->first();
         //error_log($id);
         $filter_campfires = [];
         $filter_activities = [];
@@ -67,9 +76,9 @@ class BasecampController extends Controller
             }
         }
 
-        foreach(array_chunk($activities, 500) as $activities_chunk){
+        foreach(array_chunk(json_decode($activities->data, true), 500) as $activities_chunk){
             foreach($activities_chunk as $val){
-                if($val['creator']['id'] == $id && $val['kind'] === 'question_answer_created'){
+                if($val['creator']['id'] == $id){
                     if($val['created_at'] >= $from && $val['created_at'] <= $to){
                         array_push($filter_activities, $val);
                     }  

@@ -47,7 +47,8 @@ export default function Dashboard(props) {
             .get(
                 `/api/basecamp/search?id=${
                     selectedCand.id
-                }&from=${from.toISOString()}&to=${to.toISOString()}`
+                }&from=${from.toISOString()}&to=${to.toISOString()}`,
+                { headers: { xsrfHeaderName: props.csrf_token } }
             )
             .then((res) => {
                 // console.log(res.data);
@@ -58,10 +59,8 @@ export default function Dashboard(props) {
                 });
 
                 return axios.get(
-                    "https://mytritek.co.uk/wp-json/my-lpa/v1/user-progress",
-                    {
-                        email: selectedCand.email,
-                    }
+                    `/api/lms/search?email=${selectedCand.email_address}`,
+                    { headers: { xsrfHeaderName: props.csrf_token } }
                 );
             })
             .then((res) => {
@@ -197,7 +196,7 @@ export default function Dashboard(props) {
                                                             showIcon
                                                             placeholder="To"
                                                             className="tw-w-full"
-                                                            maxDate={new Date()}
+                                                            //maxDate={new Date()}
                                                             minDate={date.from}
                                                         ></Calendar>
                                                     </div>

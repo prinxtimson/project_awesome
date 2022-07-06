@@ -22,13 +22,14 @@ class UserController extends Controller
         ]);
 
         if ($request->hasFile('avatar')) {
+            $ext = $request->file('avatar')->extension();
 
-            $path = $request->file('avatar')->storeAs(
-                'avatars', $user->id, 'public'
-            );
+            $user->addMediaFromRequest('avatar')->usingFileName($user->id.'.'.$ext)->toMediaCollection('avatars');
+    
+            $mediaUrl = $user->getFirstMediaUrl('avatars');
 
             $user->update([
-                'avatar' => 'images/' . $path,
+                'avatar' => $mediaUrl,
                 'name' => $request->firstname . ' ' . $request->lastname,
                 'phone' => $request->phone
             ]);

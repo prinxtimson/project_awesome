@@ -22,19 +22,19 @@ class Kernel extends ConsoleKernel
             $basecamp = new Basecamp;
 
             $basecamp->getPeople();
-        })->daily()->runInBackground()->at('00:00');
+        })->daily()->runInBackground();
 
         $schedule->call(function () {
             $basecamp = new Basecamp;
 
             $basecamp->getAllActivities();
-        })->daily()->runInBackground()->at('00:00');
+        })->daily()->runInBackground();
 
         $schedule->call(function () {
             $basecamp = new Basecamp;
 
             $basecamp->getAllCampfires();
-        })->daily()->runInBackground()->at('00:00');
+        })->daily()->runInBackground();
 
     }
 

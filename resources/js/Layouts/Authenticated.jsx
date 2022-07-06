@@ -13,11 +13,11 @@ export default function Authenticated({ auth, header, children }) {
     return (
         <>
             <div className="tw-min-h-screen tw-bg-gray-100">
-                <nav className="tw-bg-white tw-border-b tw-border-gray-100">
+                <nav className="tw-bg-violet-900 tw-border-b tw-border-gray-100 tw-pt-2">
                     <div className="tw-max-w-7xl tw-mx-auto tw-px-4 sm:tw-px-6 lg:tw-px-8">
                         <div className="tw-flex tw-justify-between tw-h-16">
                             <div className="tw-flex tw-w-full">
-                                <div className="tw-shrink-0 tw-flex tw-items-center">
+                                <div className="tw-bg-white tw-shrink-0 tw-flex tw-items-center tw-rounded-md tw-mb-2 tw-p-2">
                                     <Link href="/">
                                         <ApplicationLogo />
                                     </Link>
@@ -49,10 +49,10 @@ export default function Authenticated({ auth, header, children }) {
                                 <div className="tw-ml-3 tw-relative">
                                     <Dropdown>
                                         <Dropdown.Trigger>
-                                            <span className="tw-inline-flex tw-rounded-md">
+                                            <span className="tw-inline-flex tw-rounded-md tw-mb-2">
                                                 <button
                                                     type="button"
-                                                    className="tw-inline-flex tw-items-center tw-px-3 tw-py-2 tw-border tw-border-transparent tw-text-sm tw-leading-4 tw-font-medium tw-rounded-md tw-text-gray-500 tw-bg-white hover:tw-text-gray-700 focus:tw-outline-none tw-transition tw-ease-in-out tw-duration-150"
+                                                    className="tw-inline-flex tw-items-center tw-px-3 tw-py-2 tw-border tw-border-transparent tw-text-sm tw-leading-4 tw-font-medium tw-rounded-md tw-text-amber-300  hover:tw-text-amber-500 focus:tw-outline-none tw-transition tw-ease-in-out tw-duration-150"
                                                 >
                                                     {auth.user.name}
 
@@ -60,7 +60,7 @@ export default function Authenticated({ auth, header, children }) {
                                                         src={`${
                                                             auth.user.avatar
                                                         }?${new Date().getTime()}`}
-                                                        className="tw-rounded-full tw-mx-2 tw-w-12 tw-h-12"
+                                                        className="tw-rounded-full tw-mx-2 tw-w-10 tw-h-10"
                                                     />
                                                 </button>
                                             </span>

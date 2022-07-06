@@ -167,7 +167,7 @@ export default function LmsActivities({ result, searchDate, props }) {
             <Toast ref={toast} />
             <div className="tw-max-w-7xl tw-mx-auto tw-px-3 lg:tw-px-8 tw-mb-5">
                 <div className="tw-bg-white tw-overflow-hidden tw-shadow-sm tw-rounded-lg">
-                    <div className="tw-p-4 lg:tw-p-5 tw-bg-white tw-border-b tw-border-gray-200 tw-text-center">
+                    <div className="tw-p-4 lg:tw-p-5 tw-bg-white tw-border-b tw-border-gray-200 tw-text-center tw-text-xl">
                         LMS Activities
                     </div>
                 </div>

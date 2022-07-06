@@ -2,7 +2,10 @@
     "name": "laravel/laravel",
     "type": "project",
     "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "keywords": [
+        "framework",
+        "laravel"
+    ],
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
@@ -15,6 +18,7 @@
         "maatwebsite/excel": "^3.1",
         "mpdf/mpdf": "^8.1",
         "predis/predis": "^2.0",
+        "spatie/laravel-medialibrary": "^9.0.0",
         "tightenco/ziggy": "^1.0"
     },
     "require-dev": {
@@ -61,6 +65,7 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
+        "platform-check": false,
         "sort-packages": true
     },
     "minimum-stability": "dev",

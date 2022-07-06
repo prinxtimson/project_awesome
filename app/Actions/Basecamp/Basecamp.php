@@ -2,12 +2,14 @@
 
 namespace App\Actions\Basecamp;
 
+use App\Models\Basecamp as ModelsBasecamp;
 use Exception;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\LazyCollection;
 
 class Basecamp 
 {
@@ -33,14 +35,15 @@ class Basecamp
   public function getToken()
   {
     $auth = Http::withHeaders(['User-Agent'=> 'developertritek@gmail.com'])->withToken($this->access_token)->get('https://launchpad.37signals.com/authorization.json');
-
+    
     if($auth->clientError()){
       $res = Http::post('https://launchpad.37signals.com/authorization/token?type=refresh&refresh_token='.$this->refresh_token.'&client_id='.$this->client_id.'&redirect_uri=your-redirect-uri&client_secret='.$this->client_secret)->json();
-
+      
       $this->access_token = $res['access_token'];
-
+      
       config(['app.basecamp_token' => $res['access_token']]);
     }
+    
   }
 
       /**
@@ -49,6 +52,7 @@ class Basecamp
     private function setRequestOptions()
     {
         $authBearer = 'Bearer '. $this->access_token;
+        
         $this->client = new Client(
             [
                 'base_uri' => 'https://3.basecampapi.com/3950847',
@@ -61,6 +65,7 @@ class Basecamp
                 ]
             ]
         );
+       
     }
 
         /**
@@ -133,29 +138,44 @@ class Basecamp
 
   public function getAllActivities()
   {
-    $session = env('BASECAMP_SESSION');
-    $identity = env('BASECAMP_IDENTITY');
-    $verification = env('BASECAMP_VERIFICATION');
+    
+    $this->session = env('BASECAMP_SESSION');
+    $this->identity = env('BASECAMP_IDENTITY');
+    $this->verification = env('BASECAMP_VERIFICATION');
+    //dd($verification);
 
-    $activities = Http::withCookies(['_bc3_session' => $session, '_dd_s', 'bc3_identity_id' => $identity, 'bc3_session_verification_token' => $verification], '3.basecamp.com')->get('https://3.basecamp.com/3950847/reports/progress.json');
+    $activities = Http::withCookies(['_bc3_session' => $this->session, '_dd_s', 'bc3_identity_id' => $this->identity, 'bc3_session_verification_token' => $this->verification], '3.basecamp.com')->get('https://3.basecamp.com/3950847/reports/progress.json');
+      
+      $data = [];
+      foreach($activities->json() as $val) {
+        if($val['kind'] === 'question_answer_created'){
+          array_push($data, $val);
+        }
+      };
+      $this->next = $activities->header('Link');
 
-      $data = $activities->json();
-      $next = $activities->header('Link');
-      $start = 0;
+      $result = LazyCollection::times(5000)->map(function(){
+        $next_url = trim(explode(';', $this->next)[0], "<>");
 
-      while($start < 20){
-        $next = $next;
-        $next_url = trim(explode(';', $next)[0], "<>");
-        $res = Http::withCookies(['_bc3_session' => $session, '_dd_s', 'bc3_identity_id' => $identity, 'bc3_session_verification_token' => $verification], '3.basecamp.com')->get($next_url);
+        $res = Http::withCookies(['_bc3_session' => $this->session, '_dd_s', 'bc3_identity_id' => $this->identity, 'bc3_session_verification_token' => $this->verification], '3.basecamp.com')->get($next_url);
 
-        $data = array_merge($data, $res->json());
 
-        $next = $res->header('Link');
+        $this->next = $res->header('Link');
 
-        $start = $start + 1;
-      }
+        foreach($res->json() as $val) {
+          if($val['kind'] === 'question_answer_created'){
+            return $val;
+          }
+        };
+        
+      })->filter()->all();
 
-    Cache::set('bc_activities', $data);
+      $data = json_encode(array_merge($data, $result));
+
+      $res = ModelsBasecamp::updateOrCreate(['type' => 'activities'], ['data' => $data]);
+
+      return $res;
+
   }
 
   public function getPeopleOnProject($id)

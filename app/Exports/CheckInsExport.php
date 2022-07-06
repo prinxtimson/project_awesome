@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use Illuminate\Support\Facades\Cache;
+use App\Models\Basecamp;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
@@ -29,13 +29,13 @@ class CheckInsExport implements FromArray, WithMapping, ShouldAutoSize, WithHead
     public function array(): array
     {
 
-        $activities =  Cache::get('bc_activities', []);
+        $activities =  Basecamp::where('type', 'activities')->first();
         
         $filter_activities = [];
 
-        foreach(array_chunk($activities, 500) as $activities_chunk){
+        foreach(array_chunk(json_decode($activities->data, true), 500) as $activities_chunk){
             foreach($activities_chunk as $val){
-                if($val['creator']['id'] == $this->id && $val['kind'] === 'question_answer_created'){
+                if($val['creator']['id'] == $this->id){
                     if($val['created_at'] >= $this->from && $val['created_at'] <= $this->to){
                         array_push($filter_activities, $val);
                     }  

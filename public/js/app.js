@@ -2366,7 +2366,7 @@ function BasecampActivities(_ref) {
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
         className: "tw-bg-white tw-overflow-hidden tw-shadow-sm tw-rounded-lg",
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
-          className: "tw-p-4 lg:tw-p-5 tw-bg-white tw-border-b tw-border-gray-200 tw-text-center",
+          className: "tw-p-4 lg:tw-p-5 tw-bg-white tw-border-b tw-border-gray-200 tw-text-center tw-text-xl",
           children: "Basecamp Activities"
         })
       })
@@ -3311,7 +3311,7 @@ function LmsActivities(_ref) {
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
         className: "tw-bg-white tw-overflow-hidden tw-shadow-sm tw-rounded-lg",
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
-          className: "tw-p-4 lg:tw-p-5 tw-bg-white tw-border-b tw-border-gray-200 tw-text-center",
+          className: "tw-p-4 lg:tw-p-5 tw-bg-white tw-border-b tw-border-gray-200 tw-text-center tw-text-xl",
           children: "LMS Activities"
         })
       })
@@ -3586,7 +3586,7 @@ function NavLink(_ref) {
       children = _ref.children;
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_inertiajs_inertia_react__WEBPACK_IMPORTED_MODULE_1__.Link, {
     href: href,
-    className: active ? "tw-inline-flex tw-items-center tw-px-1 tw-pt-1 tw-border-b-2 tw-border-indigo-400 tw-text-sm tw-font-medium tw-leading-5 tw-text-gray-900 focus:tw-outline-none focus:tw-border-indigo-700 tw-transition tw-duration-150 tw-ease-in-out" : "tw-inline-flex tw-items-center tw-px-1 tw-pt-1 tw-border-b-2 tw-border-transparent tw-text-sm tw-font-medium tw-leading-5 tw-text-gray-500 tw-hover:tw-text-gray-700 tw-hover:tw-border-gray-300 focus:tw-outline-none focus:tw-text-gray-700 focus:tw-border-gray-300 tw-transition tw-duration-150 tw-ease-in-out",
+    className: active ? "tw-inline-flex tw-items-center tw-px-1 tw-pt-1 tw-border-b-2 tw-border-amber-400 tw-text-sm tw-font-medium tw-leading-5 tw-text-amber-400 focus:tw-outline-none focus:tw-border-indigo-700 tw-transition tw-duration-150 tw-ease-in-out " : "tw-inline-flex tw-items-center tw-px-1 tw-pt-1 tw-border-b-2 tw-border-transparent tw-text-sm tw-font-medium tw-leading-5  hover:tw-text-amber-300 hover:tw-border-amber-300 focus:tw-outline-none focus:tw-text-amber-300 focus:tw-border-amber-300 tw-transition tw-duration-150 tw-ease-in-out tw-text-white",
     children: children
   });
 }
@@ -3921,7 +3921,7 @@ function Authenticated(_ref) {
     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("div", {
       className: "tw-min-h-screen tw-bg-gray-100",
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("nav", {
-        className: "tw-bg-white tw-border-b tw-border-gray-100",
+        className: "tw-bg-violet-900 tw-border-b tw-border-gray-100 tw-pt-2",
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("div", {
           className: "tw-max-w-7xl tw-mx-auto tw-px-4 sm:tw-px-6 lg:tw-px-8",
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("div", {
@@ -3929,7 +3929,7 @@ function Authenticated(_ref) {
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("div", {
               className: "tw-flex tw-w-full",
               children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("div", {
-                className: "tw-shrink-0 tw-flex tw-items-center",
+                className: "tw-bg-white tw-shrink-0 tw-flex tw-items-center tw-rounded-md tw-mb-2 tw-p-2",
                 children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_inertiajs_inertia_react__WEBPACK_IMPORTED_MODULE_5__.Link, {
                   href: "/",
                   children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_Components_ApplicationLogo__WEBPACK_IMPORTED_MODULE_1__["default"], {})
@@ -3957,13 +3957,13 @@ function Authenticated(_ref) {
                 children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_Components_Dropdown__WEBPACK_IMPORTED_MODULE_2__["default"], {
                   children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_Components_Dropdown__WEBPACK_IMPORTED_MODULE_2__["default"].Trigger, {
                     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("span", {
-                      className: "tw-inline-flex tw-rounded-md",
+                      className: "tw-inline-flex tw-rounded-md tw-mb-2",
                       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("button", {
                         type: "button",
-                        className: "tw-inline-flex tw-items-center tw-px-3 tw-py-2 tw-border tw-border-transparent tw-text-sm tw-leading-4 tw-font-medium tw-rounded-md tw-text-gray-500 tw-bg-white hover:tw-text-gray-700 focus:tw-outline-none tw-transition tw-ease-in-out tw-duration-150",
+                        className: "tw-inline-flex tw-items-center tw-px-3 tw-py-2 tw-border tw-border-transparent tw-text-sm tw-leading-4 tw-font-medium tw-rounded-md tw-text-amber-300  hover:tw-text-amber-500 focus:tw-outline-none tw-transition tw-ease-in-out tw-duration-150",
                         children: [auth.user.name, /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("img", {
                           src: "".concat(auth.user.avatar, "?").concat(new Date().getTime()),
-                          className: "tw-rounded-full tw-mx-2 tw-w-12 tw-h-12"
+                          className: "tw-rounded-full tw-mx-2 tw-w-10 tw-h-10"
                         })]
                       })
                     })
@@ -4913,11 +4913,17 @@ function Dashboard(props) {
       return;
     }
 
-    axios.get("/api/basecamp/search?id=".concat(selectedCand.id, "&from=").concat(from.toISOString(), "&to=").concat(to.toISOString())).then(function (res) {
+    axios.get("/api/basecamp/search?id=".concat(selectedCand.id, "&from=").concat(from.toISOString(), "&to=").concat(to.toISOString()), {
+      headers: {
+        xsrfHeaderName: props.csrf_token
+      }
+    }).then(function (res) {
       // console.log(res.data);
       setSearchResult(_objectSpread(_objectSpread(_objectSpread({}, searchResult), selectedCand), res.data));
-      return axios.get("https://mytritek.co.uk/wp-json/my-lpa/v1/user-progress", {
-        email: selectedCand.email
+      return axios.get("/api/lms/search?email=".concat(selectedCand.email_address), {
+        headers: {
+          xsrfHeaderName: props.csrf_token
+        }
       });
     }).then(function (res) {
       var minDate = from.getTime();
@@ -5042,8 +5048,8 @@ function Dashboard(props) {
                           showButtonBar: true,
                           showIcon: true,
                           placeholder: "To",
-                          className: "tw-w-full",
-                          maxDate: new Date(),
+                          className: "tw-w-full" //maxDate={new Date()}
+                          ,
                           minDate: date.from
                         })
                       })]
