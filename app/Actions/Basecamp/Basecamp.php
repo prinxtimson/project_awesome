@@ -146,35 +146,47 @@ class Basecamp
 
     $activities = Http::withCookies(['_bc3_session' => $this->session, '_dd_s', 'bc3_identity_id' => $this->identity, 'bc3_session_verification_token' => $this->verification], '3.basecamp.com')->get('https://3.basecamp.com/3950847/reports/progress.json');
       
-      $data = [];
-      foreach($activities->json() as $val) {
+      $data = array_filter($activities->json(), function($val) {
         if($val['kind'] === 'question_answer_created'){
-          array_push($data, $val);
+          return $val;
         }
-      };
+      }); 
+
       $this->next = $activities->header('Link');
 
-      $result = LazyCollection::times(5000)->map(function(){
+      $results = LazyCollection::times(2000)->map(function(){
         $next_url = trim(explode(';', $this->next)[0], "<>");
 
         $res = Http::withCookies(['_bc3_session' => $this->session, '_dd_s', 'bc3_identity_id' => $this->identity, 'bc3_session_verification_token' => $this->verification], '3.basecamp.com')->get($next_url);
 
-
         $this->next = $res->header('Link');
 
-        foreach($res->json() as $val) {
+        $result = array_filter($res->json(), function($val) {
           if($val['kind'] === 'question_answer_created'){
             return $val;
           }
-        };
+        }); 
+
+        return $result;
         
-      })->filter()->all();
+      })->all();
 
-      $data = json_encode(array_merge($data, $result));
+      foreach($results as $result){
+        $data = array_merge($data, $result);   
+      }
+     
+      $db_data = [];
+      
+      foreach(array_chunk($data, 100) as $data_chunk){ 
+        array_push($db_data, [
+          'type' => 'activities',
+        'data' => json_encode($data_chunk)
+      ]);
+    }
 
-      $res = ModelsBasecamp::updateOrCreate(['type' => 'activities'], ['data' => $data]);
+    ModelsBasecamp::insert($db_data);
 
-      return $res;
+       dd($data);
 
   }
 
